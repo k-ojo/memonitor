@@ -25,6 +25,7 @@ dependencies.lock
 credentials.json
 credentials.csv
 credentials.bin
+*.bin
 temp_config.h
 main/temp_config.h
 include/temp_config.h

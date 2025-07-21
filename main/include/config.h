@@ -17,7 +17,7 @@
 #define HTTP_TIMEOUT_MS 10000
 
 // NVS storage keys for credentials - MUST match Python script keys
-#define NVS_NAMESPACE NULL
+#define NVS_NAMESPACE "credentials"
 #define NVS_WIFI_SSID_KEY "wifi_ssid"
 #define NVS_WIFI_PASS_KEY "wifi_pass"
 #define NVS_FIREBASE_PROJECT_ID_KEY "fb_project"    // Changed from "fb_project_id"

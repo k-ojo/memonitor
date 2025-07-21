@@ -80,25 +80,28 @@ def create_credentials_json(wifi_ssid, wifi_password, firebase_project_id, fireb
     print("✓ Created credentials.json")
     return credentials
 
-def generate_nvs_csv(credentials, csv_path="credentials.csv"):
-    """Generate NVS CSV file from credentials with 15-char key limit."""
+def generate_nvs_csv(credentials, csv_path="credentials.csv", namespace="credentials"):
+    """Generate NVS CSV file from credentials with configurable namespace."""
     
     with open(csv_path, "w") as f:
         f.write("key,type,encoding,value\n")
-        # NVS keys must be <= 15 characters
+        # Add namespace entry first
+        f.write(f"{namespace},namespace,,\n")
+        # NVS keys must be <= 15 characters - these match your config.h defines
         f.write(f"wifi_ssid,data,string,{credentials['wifi']['ssid']}\n")
         f.write(f"wifi_pass,data,string,{credentials['wifi']['password']}\n")
         f.write(f"fb_project,data,string,{credentials['firebase']['project_id']}\n")
         f.write(f"fb_db_url,data,string,{credentials['firebase']['database_url']}\n")
         f.write(f"fb_api_key,data,string,{credentials['firebase']['api_key']}\n")
     
-    print(f"✓ Created {csv_path}")
-    print("📝 NVS key mappings:")
-    print("  - wifi_ssid → WiFi SSID")
-    print("  - wifi_pass → WiFi Password") 
-    print("  - fb_project → Firebase Project ID")
-    print("  - fb_db_url → Firebase Database URL")
-    print("  - fb_api_key → Firebase API Key")
+    print(f"✓ Created {csv_path} with namespace '{namespace}'")
+    print("📝 NVS key mappings (matching your config.h):")
+    print("  - wifi_ssid → WiFi SSID (NVS_WIFI_SSID_KEY)")
+    print("  - wifi_pass → WiFi Password (NVS_WIFI_PASS_KEY)") 
+    print("  - fb_project → Firebase Project ID (NVS_FIREBASE_PROJECT_ID_KEY)")
+    print("  - fb_db_url → Firebase Database URL (NVS_FIREBASE_DB_URL_KEY)")
+    print("  - fb_api_key → Firebase API Key (NVS_FIREBASE_API_KEY_KEY)")
+    print(f"  - namespace: '{namespace}' (NVS_NAMESPACE)")
     return csv_path
 
 def generate_nvs_bin(csv_path, bin_path="credentials.bin", partition_size=0x5000):
@@ -297,7 +300,7 @@ def validate_inputs(wifi_ssid, wifi_password, firebase_project_id, firebase_db_u
     
     return errors, warnings
 
-def interactive_setup():
+def interactive_setup(namespace="credentials"):
     """Interactive credential setup."""
     
     print("ESP32-CAM Credentials Setup with NVS Support")
@@ -339,6 +342,7 @@ def interactive_setup():
     print(f"Firebase Project ID: {firebase_project_id}")
     print(f"Firebase Database URL: {firebase_db_url}")
     print(f"Firebase API Key: {firebase_api_key[:8]}...")
+    print(f"NVS Namespace: {namespace}")
     print()
     
     confirm = input("Save these credentials? (y/N): ").strip().lower()
@@ -355,9 +359,9 @@ def interactive_setup():
     else:
         port = False
     
-    return process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key, port)
+    return process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key, port, namespace)
 
-def process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key, port=None):
+def process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key, port=None, namespace="credentials"):
     """Process and save credentials."""
     
     try:
@@ -366,9 +370,9 @@ def process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_
         create_config_header(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key)
         create_gitignore()
         
-        # Generate NVS files
+        # Generate NVS files with specified namespace
         print("\n🔄 Generating NVS partition...")
-        csv_path = generate_nvs_csv(credentials)
+        csv_path = generate_nvs_csv(credentials, namespace=namespace)
         bin_path = generate_nvs_bin(csv_path)
         
         # Flash to ESP32 if requested
@@ -396,6 +400,7 @@ def process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_
         print("2. Your ESP32-CAM will load credentials from NVS automatically")
         print()
         print("💡 Your ESP32 code should use these NVS keys:")
+        print(f"  - nvs_open(\"{namespace}\", NVS_READONLY, &handle)")
         print("  - nvs_get_str(handle, \"wifi_ssid\", buffer, &length)")
         print("  - nvs_get_str(handle, \"wifi_pass\", buffer, &length)")
         print("  - nvs_get_str(handle, \"fb_project\", buffer, &length)")
@@ -439,6 +444,7 @@ def main():
     parser.add_argument("--port", "-p", help="ESP32 serial port (e.g., /dev/ttyUSB0)")
     parser.add_argument("--no-flash", action="store_true", help="Don't flash to ESP32, just generate files")
     parser.add_argument("--baud", type=int, default=115200, help="Serial baud rate (default: 115200)")
+    parser.add_argument("--namespace", "-n", default="credentials", help="NVS namespace (default: credentials)")
     
     args = parser.parse_args()
     
@@ -456,7 +462,7 @@ def main():
     
     # Interactive setup if missing parameters or explicitly requested
     if args.interactive or not all([wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key]):
-        return interactive_setup()
+        return interactive_setup(args.namespace)
     
     # Validate inputs
     errors, warnings = validate_inputs(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key)
@@ -476,7 +482,7 @@ def main():
     # Determine port
     port = args.port if not args.no_flash else False
     
-    return process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key, port)
+    return process_credentials(wifi_ssid, wifi_password, firebase_project_id, firebase_db_url, firebase_api_key, port, args.namespace)
 
 if __name__ == "__main__":
     try:

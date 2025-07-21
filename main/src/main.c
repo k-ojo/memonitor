@@ -161,7 +161,7 @@ void dump_credentials() {
     // Test keys that might exist
     const char* test_keys[] = {
         "wifi_ssid", "wifi_pass", 
-        "fb_project", "fb_project_id", 
+        "fb_project", 
         "fb_db_url", "fb_api_key"
     };
     
