@@ -5,8 +5,8 @@
 #define NUMBER_OF_SECONDS 30
 
 // Camera configuration
-#define CAMERA_FRAME_SIZE FRAMESIZE_VGA
-#define CAMERA_JPEG_QUALITY 15
+#define CAMERA_FRAME_SIZE FRAMESIZE_QVGA
+#define CAMERA_JPEG_QUALITY 12
 #define CAMERA_FB_COUNT 1
 
 // WiFi configuration

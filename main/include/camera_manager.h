@@ -13,6 +13,15 @@ typedef struct {
     int fb_count;
 } camera_config_params_t;
 
+// Renamed to avoid conflict with esp32-camera driver's camera_status_t
+typedef struct {
+    bool is_initialized;
+    size_t free_heap;
+    size_t free_psram;
+    uint16_t sensor_id;
+} camera_manager_status_t;
+
+esp_err_t camera_get_status(camera_manager_status_t *status);
 // Function declarations
 esp_err_t camera_init_with_config(const camera_config_params_t *params);
 esp_err_t camera_init_default(void);

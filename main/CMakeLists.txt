@@ -16,4 +16,5 @@ idf_component_register(
         json
         mbedtls
         driver
+        esp_psram
 )
