@@ -1,0 +1,19 @@
+idf_component_register(
+    SRCS 
+        "src/main.c"
+        "src/credentials_manager.c"
+        "src/wifi_manager.c"
+        "src/firebase_manager.c"
+        "src/camera_manager.c"
+    INCLUDE_DIRS 
+        "include"
+    REQUIRES
+        nvs_flash
+        esp_wifi
+        esp_event
+        esp_http_client
+        esp32-camera
+        json
+        mbedtls
+        driver
+)

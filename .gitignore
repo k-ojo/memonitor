@@ -1,0 +1,47 @@
+# Credentials and sensitive files
+credentials.json
+temp_config.h
+main/temp_config.h
+include/temp_config.h
+main/include/temp_config.h
+
+# Build files
+build/
+sdkconfig
+sdkconfig.old
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ESP-IDF specific
+managed_components/
+dependencies.lock
+
+# Credentials and sensitive files
+credentials.json
+credentials.csv
+credentials.bin
+temp_config.h
+main/temp_config.h
+include/temp_config.h
+main/include/temp_config.h
+
+# Build files
+build/
+sdkconfig
+sdkconfig.old
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ESP-IDF specific
+managed_components/
+dependencies.lock
